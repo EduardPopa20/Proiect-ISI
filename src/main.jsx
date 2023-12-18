@@ -7,6 +7,7 @@ import RegisterPage from "./pages/Auth/RegisterPage.jsx";
 import RecoverPasswordPage from "./pages/Auth/RecoverPasswordPage.jsx";
 import ResetPasswordPage from "./pages/Auth/ResetPasswordPage.jsx";
 import Homepage from "./pages/Homepage.jsx";
+import AddOrderPage from "./pages/Order/AddOrderPage.jsx";
 import ViewMap from "./components/ViewMap.jsx";
 
 import Paths from "./resources/Paths.js";
@@ -22,6 +23,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path={Paths.forgotPassword} element={<RecoverPasswordPage />} />
         <Route path={Paths.resetPassword} element={<ResetPasswordPage />} />
         <Route path={Paths.homepage} element={<Homepage />} />
+        <Route path={Paths.addOrder} element={<AddOrderPage />}/>
         <Route path={Paths.viewMap} element={<ViewMap />} />
       </Routes>
     </BrowserRouter>

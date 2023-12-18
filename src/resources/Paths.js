@@ -6,5 +6,6 @@ export default {
   resetPassword: "/password-reset",
   userProfile: "/profile",
   homepage: "/home",
+  addOrder: "/add-order",
   viewMap: "/view-map",
 };
