@@ -53,10 +53,10 @@ const RegisterPage = () => {
         email: user.email,
         firstName: firstName,
         lastName: lastName,
+        role: "courier",
       });
 
       navigate("/home");
-      localStorage.setItem("userId", user.uid);
     } catch (error) {
       const errorCode = error.code;
       const errorMessage = error.message;

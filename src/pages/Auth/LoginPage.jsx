@@ -16,7 +16,7 @@ const LoginPage = () => {
       .then((userCredential) => {
         const user = userCredential.user;
         navigate("/home");
-        console.log(user);
+        localStorage.setItem("userId", user.uid);
       })
       .catch((error) => {
         const errorCode = error.code;

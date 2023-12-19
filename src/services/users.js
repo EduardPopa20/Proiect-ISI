@@ -1,15 +1,12 @@
-import { getDocs, collection } from "firebase/firestore";
+import { getDocs, collection, doc, getDoc } from "firebase/firestore";
 
-import { getDb } from "./firebase";
-
-const collection_name = "users";
+import { db } from "./firebase";
 
 export const findAll = async () => {
-  const doc_refs = await getDocs(collection(getDb(), collection_name));
+  const doc_refs = await getDocs(collection(db, "users"));
   const res = [];
 
   doc_refs.forEach((user) => {
-    console.log(user.id);
     res.push({
       id: user.id,
       ...user.data(),
@@ -17,4 +14,27 @@ export const findAll = async () => {
   });
 
   return res;
+};
+
+export const getCurrentUserById = async (userId) => {
+  if (!userId) {
+    return null;
+  }
+
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const userSnapshot = await getDoc(userDocRef);
+
+    if (userSnapshot.exists()) {
+      return {
+        id: userSnapshot.id,
+        ...userSnapshot.data(),
+      };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return null;
+  }
 };
