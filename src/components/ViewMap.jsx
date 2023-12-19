@@ -135,35 +135,50 @@ const ViewMap = () => {
           });
 
           graphicsLayer.add(movingPointGraphic);
-
           let currentIndex = 0;
           const speedFactor = 0.1; 
           let continueAnimation = true;
           let popupTimeout = null;
+          let totalDistance = optimizedStops.reduce((acc, _, index, array) => {
+            if (index < array.length - 1) {
+              const currentPoint = optimizedStops[index].geometry;
+              const nextPoint = optimizedStops[index + 1].geometry;
+              return acc + calculateDistanceToNextPoint(currentPoint, nextPoint);
+            }
+            return acc;
+          }, 0);
           const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
           
           const movePoint = async () => {
             while (continueAnimation) {
               const nextStop = optimizedStops[(currentIndex + 1) % optimizedStops.length];
               const currentPoint = movingPointGraphic.geometry;
-          
               const newPoint = new Point({
                 latitude: currentPoint.latitude + (nextStop.geometry.latitude - currentPoint.latitude) * speedFactor,
                 longitude: currentPoint.longitude + (nextStop.geometry.longitude - currentPoint.longitude) * speedFactor,
               });
-          
+
               movingPointGraphic.geometry = newPoint;
-          
+
               const distanceToNextStop = calculateDistance(currentPoint, nextStop.geometry);
+
               if (distanceToNextStop < 0.0001) {
+
                 currentIndex = (currentIndex + 1) % optimizedStops.length;
-          
                 const screenCoordinates = viewRef.current.toScreen(nextStop.geometry);
-          
+                const nextPoint = optimizedStops[currentIndex + 1].geometry;
+                const displayDistance = calculateDistanceToNextPoint(newPoint, nextPoint);
+                const actualDistance = calculateDistanceToNextPoint(optimizedStops[currentIndex].geometry, optimizedStops[currentIndex - 1].geometry);
+                totalDistance = totalDistance - actualDistance;
+
+
                 await new Promise(resolve => {
                   viewRef.current.popup.open({
                     title: "Destination Reached",
-                    content: `<div>You have reached the destination</div>`,
+                    content: `<div>You have reached the ${getOrdinal(currentIndex)} destination </div>
+                              <div>You have ${displayDistance.toFixed(2)} km remaining to the next destination </div>
+                              <div>Total Distance Remaining : ${totalDistance.toFixed(2)} km</div>`,
                     location: viewRef.current.toMap({
                       x: screenCoordinates.x,
                       y: screenCoordinates.y,
@@ -251,22 +266,46 @@ const ViewMap = () => {
           }
 
           function calculateDistance(point1, point2) {
-            return Math.sqrt(
-              Math.pow(point1.x - point2.x, 2) + Math.pow(point1.y - point2.y, 2)
-            );
+            const x1 = point1.longitude;
+            const y1 = point1.latitude;
+            const x2 = point2.longitude;
+            const y2 = point2.latitude;
+            const distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+          
+            return distance;
           }
 
 
-          const extractDestinationName = (stop) => {
-            if (stop && stop.attributes) {
-              if (stop.attributes.Name) {
-                return stop.attributes.Name;
-              } else if (stop.attributes["name"]) {
-                return stop.attributes["name"];
-              }
-            }
-            return null;
-          };
+          function calculateDistanceToNextPoint(currentPoint, lastPoint) {
+            const degreesToRadians = (degrees) => (degrees * Math.PI) / 180;
+            const earthRadiusKm = 6371; 
+          
+            const lat1 = degreesToRadians(currentPoint.latitude);
+            const lon1 = degreesToRadians(currentPoint.longitude);
+            const lat2 = degreesToRadians(lastPoint.latitude);
+            const lon2 = degreesToRadians(lastPoint.longitude);
+            const dlat = lat2 - lat1;
+            const dlon = lon2 - lon1;
+          
+            const a =
+              Math.sin(dlat / 2) ** 2 +
+              Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2) ** 2;
+          
+            const c = 2 * Math.asin(Math.sqrt(a));
+      
+            const distance = earthRadiusKm * c;
+          
+            return distance;
+          }
+
+          function getOrdinal(number) {
+            const suffixes = ["th", "st", "nd", "rd"];
+            const lastDigit = number % 10;
+            const specialSuffix = (number % 100 - lastDigit) / 10 === 1 ? "th" : "";
+          
+            return number + (suffixes[lastDigit] || specialSuffix || "th");
+          }
+          
         }
       } catch (error) {
         console.error("Error loading map:", error);
