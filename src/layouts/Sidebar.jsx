@@ -1,19 +1,28 @@
 import { useEffect, useState } from "react";
-import { Drawer, List, ListItem, ListItemText, IconButton } from "@mui/material";
+import { Drawer, List, ListItem, ListItemText, IconButton, Link } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import MenuIcon from "@mui/icons-material/Menu";
 import { getCurrentUserById } from "../services/users";
 
 const drawerWidth = 240;
 
-const courierLinks = ["See", "About", "Services", "Contact"];
-const adminLinks = ["sdadadsadasa", "cevaaaaaaa", "Add Order", "Manage Orders"];
+const courierLinks = [
+  { text: "See", url: "/see" },
+  { text: "See", url: "/see" },
+  { text: "About", url: "/about" },
+  { text: "Services", url: "/services" },
+  { text: "Contact", url: "/contact" },
+];
+const adminLinks = [
+  { text: "sdadadsadasa", url: "/something" },
+  { text: "cevaaaaaaa", url: "/ceva" },
+  { text: "Add Order", url: "/add-order" },
+  { text: "Manage Orders", url: "/manage-orders" },
+];
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
 
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [links, setLinks] = useState([]);
 
   useEffect(() => {
@@ -22,8 +31,7 @@ const Sidebar = () => {
         const userId = localStorage.getItem("userId");
         if (userId) {
           const userData = await getCurrentUserById(userId);
-          setUser(userData);
-          console.log(userData);
+
           if (userData) {
             if (userData.role === "admin") {
               setLinks(adminLinks);
@@ -34,8 +42,6 @@ const Sidebar = () => {
         }
       } catch (error) {
         console.error("Error fetching user:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -54,19 +60,24 @@ const Sidebar = () => {
         open={open}
         onClose={() => setOpen(false)}
         sx={{
-          marginTop: navbarHeight,
           width: drawerWidth,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
             width: drawerWidth,
-            top: 60,
+            top: 64,
           },
         }}
       >
         <List>
-          {links.map((text, index) => (
-            <ListItem index={index} key={text}>
-              <ListItemText primary={text} />
+          {links.map((link, index) => (
+            <ListItem key={index} sx={{ "&:hover": { backgroundColor: "#f0f0f0" } }}>
+              <Link
+                href={link.url}
+                color="inherit"
+                sx={{ textDecoration: "none", "&:hover": { color: "#1976d2" } }}
+              >
+                <ListItemText primary={link.text} />
+              </Link>
             </ListItem>
           ))}
         </List>
