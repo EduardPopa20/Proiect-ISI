@@ -9,6 +9,7 @@ import SimpleLineSymbol from '@arcgis/core/symbols/SimpleLineSymbol';
 import RouteParameters from "@arcgis/core/rest/support/RouteParameters";
 import FeatureSet from "@arcgis/core/rest/support/FeatureSet";
 import { solve } from "@arcgis/core/rest/route";
+import "./ViewMap.css";
 
 
 const ViewMap = () => {
@@ -105,8 +106,8 @@ const ViewMap = () => {
                     geometry: result.route.geometry,
                     symbol: {
                       type: "simple-line",
-                      color: [0, 0, 0.2],
-                      width: 0.01,
+                      color: [0, 0, 0],
+                      width: 2,
                     },
                   });
                   routeGraphics.push(routeGraphic);
@@ -183,16 +184,24 @@ const ViewMap = () => {
                       x: screenCoordinates.x,
                       y: screenCoordinates.y,
                     }),
-                    actions: [{
-                      title: "Continue",
-                      id: "continue",
-                    }],
+                    actions: [
+                      {
+                        title: "Delivered",
+                        id: "check-mark",
+                        className: "check-mark-button",
+                      } ,
+                      {
+                        title: "Not Delivered",
+                        id: "uncheck-mark",
+                        className: "uncheck-mark-button",
+                      },
+                  ],
                   });
           
                   const checkPopupVisibility = () => {
                     if (viewRef.current.popup.visible) {
                       viewRef.current.popup.on("trigger-action", (event) => {
-                        if (event.action.id === "continue") {
+                        if (event.action.id === "check-mark" || event.action.id === "uncheck-mark") {
                           viewRef.current.popup.close();
                           resolve();
                         }
