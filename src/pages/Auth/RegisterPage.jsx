@@ -18,6 +18,8 @@ const RegisterPage = () => {
   const [passwordStrongError, setPassordStrongError] = useState(false);
   const [validEmailError, setValidEmailError] = useState(true);
 
+  const navigate = useNavigate();
+
   const isEmailValid = (value) => {
     return regexes.email.test(value);
   };
@@ -39,8 +41,6 @@ const RegisterPage = () => {
       ? setPasswordsMatchError("")
       : setPasswordsMatchError("Passwords do not match!");
   }, [email, password, confirmPassword]);
-
-  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
