@@ -54,7 +54,7 @@ const Sidebar = () => {
         open={open}
         onClose={() => setOpen(false)}
         sx={{
-          marginTop: navbarHeight,
+          marginTop: 64,
           width: drawerWidth,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
