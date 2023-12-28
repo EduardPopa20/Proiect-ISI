@@ -23,7 +23,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path={Paths.register} element={<RegisterPage />} />
         <Route path={Paths.forgotPassword} element={<RecoverPasswordPage />} />
         <Route path={Paths.resetPassword} element={<ResetPasswordPage />} />
-        <Route index element={<Homepage />} />
+        <Route
+          path={Paths.homepage}
+          element={
+            <AuthLayout>
+              <Homepage />
+            </AuthLayout>
+          }
+        />
         <Route
           path={Paths.addOrder}
           element={

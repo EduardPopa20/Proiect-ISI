@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { db } from "../../services/firebase";
-import { setDoc, doc, collection, addDoc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { Button, TextField, FormControlLabel, Checkbox, Grid, Paper, Typography } from '@mui/material';
 
 const AddOrderPage = () => {
@@ -68,25 +68,34 @@ const AddOrderPage = () => {
       };
 
 
-      const handleAddLocation = async () => {
-        try {
-            console.log(locationData);
-            const locationId = await addLocation(locationData);
+      // const handleAddLocation = async () => {
+      //   try {
+      //       console.log(locationData);
+      //       const locationId = await addLocation(locationData);
         
-            setOrderData((prevData) => ({
-              ...prevData,
-              location_id: locationId,
-            }));
+      //       setOrderData((prevData) => ({
+      //         ...prevData,
+      //         location_id: locationId,
+      //       }));
         
-            // Hide location fields after adding
-            setLocationFieldsVisible(false);
-          } catch (error) {
-            // Handle error, show error message, etc.
-          }
-      };
+      //       // Hide location fields after adding
+      //       setLocationFieldsVisible(false);
+      //     } catch (error) {
+      //       // Handle error, show error message, etc.
+      //     }
+      // };
 
       const handleAddOrder = async () => {
         try {
+          const locationId = await addLocation(locationData);
+
+          // Set location_id in orderData
+          setOrderData((prevData) => ({
+            ...prevData,
+            location_id: addedLocationId,
+          }));
+
+
             await addOrder(orderData);
         
             // Reset form after successful addition
@@ -96,7 +105,6 @@ const AddOrderPage = () => {
               delivered: false,
             });
           } catch (error) {
-            // Handle error, show error message, etc.
           }
       };
 
@@ -143,15 +151,6 @@ const AddOrderPage = () => {
                   fullWidth
                   margin="normal"
                 />
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleAddLocation}
-                  fullWidth
-                  style={{ marginTop: '20px' }}
-                >
-                  Add Location
-                </Button>
               </>
             )}
                 <TextField
@@ -162,17 +161,6 @@ const AddOrderPage = () => {
                   onChange={handleChange}
                   fullWidth
                   margin="normal"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      name="delivered"
-                      checked={orderData.delivered}
-                      onChange={handleChange}
-                      color="primary"
-                    />
-                  }
-                  label="Delivered"
                 />
                 <Button
                   variant="contained"

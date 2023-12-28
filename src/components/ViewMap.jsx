@@ -104,8 +104,8 @@ const ViewMap = () => {
           } 
         });
 
-        map.add(gasStationLayer);
-        map.add(atmLayer);
+         map.add(gasStationLayer);
+         map.add(atmLayer);
         map.add(earthquakeStreetsLayer);
         
         const graphicsLayer = new GraphicsLayer();
