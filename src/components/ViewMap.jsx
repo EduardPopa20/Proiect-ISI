@@ -8,8 +8,10 @@ import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
 import SimpleLineSymbol from '@arcgis/core/symbols/SimpleLineSymbol';
 import RouteParameters from "@arcgis/core/rest/support/RouteParameters";
 import FeatureSet from "@arcgis/core/rest/support/FeatureSet";
+import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
 import { solve } from "@arcgis/core/rest/route";
 import "./ViewMap.css";
+import { findAll } from "../services/locations";
 
 
 const ViewMap = () => {
@@ -18,22 +20,17 @@ const ViewMap = () => {
   const routeUrl =
     "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
 
-
-  const samplePoints = [
-    [44.42740653731108, 26.05824533838864], 
-    [44.40827938495116, 26.08347955926633],
-    [44.44285082346673, 26.075583136406642],
-    [44.390495331061295, 26.166048681632976],
-    [44.452286988938845, 26.139956148849734],
-    [44.39932670956159, 26.077814734171337],
-    [44.390495331061295, 26.166048681632976],
-  ];
+  const samplePoints = [];  
 
   useEffect(() => {
 
-    esriConfig.apiKey = "AAPKeb62f5f7bd2247559a15a90d1f0793027a9QbG68B_J4KLymxgPFVKLvgGT16REirWHCgSjb0UzSkPDE5kncCC9s2zce4j5u";
+
     const loadMap = async () => {
       try {
+
+        esriConfig.apiKey = "AAPKeb62f5f7bd2247559a15a90d1f0793027a9QbG68B_J4KLymxgPFVKLvgGT16REirWHCgSjb0UzSkPDE5kncCC9s2zce4j5u";
+        const locations = await findAll();
+        samplePoints.push(...locations.map(location => [location.latitude, location.longitude]));
         const map = new ArcGISMap({
           basemap: "topo-vector",
         });
@@ -44,8 +41,73 @@ const ViewMap = () => {
           center: [26.102071251636296, 44.42778827633022],
           zoom: 12,
         });
-        
+
         viewRef.current = view;
+        
+        const gasStationLayerUrl = "https://services.arcgis.com/QdgN7M954kkInJsA/arcgis/rest/services/Benzinarii/FeatureServer";
+        const gasStationLayer = new FeatureLayer({
+          url: gasStationLayerUrl,
+          outFields: ["*"],
+          visible: true,
+          renderer: {
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              color: [0, 0, 255],
+              outline: {
+                color: [255, 255, 255],
+                width: 1
+              },
+              size: 8
+            }
+          } 
+        });
+
+
+        const atmLayerUrl = "https://services8.arcgis.com/SXiEEy1skwB5SrYh/arcgis/rest/services/Bucharest_Ilfov_hospitals/FeatureServer";
+        const atmLayer = new FeatureLayer({
+          url: atmLayerUrl,
+          outFields: ["*"],
+          visible: true,
+          renderer: {
+            type: "simple",
+            symbol: {
+              type: "simple-marker",
+              color: [0, 120, 120],
+              outline: {
+                color: [255, 255, 255],
+                width: 1
+              },
+              size: 8
+            }
+          } 
+        });
+
+
+
+        const earthquakeStreetsLayerUrl = "https://services8.arcgis.com/SXiEEy1skwB5SrYh/arcgis/rest/services/Bucuresti_-_Zone_potential_afectate_la_cutremur/FeatureServer";
+        const earthquakeStreetsLayer = new FeatureLayer({
+          url: earthquakeStreetsLayerUrl,
+          outFields: ["*"],
+          visible: true,
+          renderer: {
+            type: "simple",
+            symbol: {
+              type: "simple-line",
+              color: [124, 124, 0],
+              outline: {
+                color: [124, 124, 0],
+                width: 1
+              },
+              size: 8
+            }
+          } 
+        });
+
+        map.add(gasStationLayer);
+        map.add(atmLayer);
+        map.add(earthquakeStreetsLayer);
+        
         const graphicsLayer = new GraphicsLayer();
         map.add(graphicsLayer);
     
@@ -67,7 +129,7 @@ const ViewMap = () => {
                   color: [255, 255, 255],
                   width: 1,
                 },
-                size: 10,
+                size: 12,
               },
               attributes: {
                 name: `Point ${index + 1}`,
@@ -83,7 +145,7 @@ const ViewMap = () => {
             }),
           }));
           
-          if (stops && stops.length > 1 && stops.length) {
+          if (stops && stops.length > 1) {
             const optimizedStops = optimizeRoute(stops);
             const routeParams = new RouteParameters({
               stops: new FeatureSet({
@@ -152,6 +214,7 @@ const ViewMap = () => {
 
           
           const movePoint = async () => {
+            let nextPoint;
             while (continueAnimation) {
               const nextStop = optimizedStops[(currentIndex + 1) % optimizedStops.length];
               const currentPoint = movingPointGraphic.geometry;
@@ -167,8 +230,14 @@ const ViewMap = () => {
               if (distanceToNextStop < 0.0001) {
 
                 currentIndex = (currentIndex + 1) % optimizedStops.length;
-                const screenCoordinates = viewRef.current.toScreen(nextStop.geometry);
-                const nextPoint = optimizedStops[currentIndex + 1].geometry;
+                console.log(currentIndex)
+                console.log(optimizedStops.length)
+                if (currentIndex == optimizedStops.length - 1) {
+                   nextPoint = optimizedStops[0].geometry;
+                  }
+                else {
+                   nextPoint = optimizedStops[currentIndex + 1].geometry;
+                }
                 const displayDistance = calculateDistanceToNextPoint(newPoint, nextPoint);
                 const actualDistance = calculateDistanceToNextPoint(optimizedStops[currentIndex].geometry, optimizedStops[currentIndex - 1].geometry);
                 totalDistance = totalDistance - actualDistance;
@@ -177,13 +246,16 @@ const ViewMap = () => {
                 await new Promise(resolve => {
                   viewRef.current.popup.open({
                     title: "Destination Reached",
-                    content: `<div>You have reached the ${getOrdinal(currentIndex)} destination </div>
-                              <div>You have ${displayDistance.toFixed(2)} km remaining to the next destination </div>
-                              <div>Total Distance Remaining : ${totalDistance.toFixed(2)} km</div>`,
-                    location: viewRef.current.toMap({
-                      x: screenCoordinates.x,
-                      y: screenCoordinates.y,
-                    }),
+                    content:  
+                              
+                              `${currentIndex === optimizedStops.length - 1 ? 
+                              `<div>Congratulations, you reached the ${getOrdinal(currentIndex)} and final destination of the day !</div>`
+                              : `<div>You have reached the ${getOrdinal(currentIndex)} destination </div>` }
+                              ${currentIndex === optimizedStops.length - 1 ? `<div>Please return to garage, you have ${displayDistance.toFixed(2)} km back to garage` 
+                              : `<div>You have ${displayDistance.toFixed(2)} km remaining to the next destination </div>` }
+                              ${currentIndex === optimizedStops.length - 1 ? ' ' 
+                              : `<div>Total Distance Remaining : ${totalDistance.toFixed(2)} km</div>` }`,
+                             
                     actions: [
                       {
                         title: "Delivered",
@@ -331,9 +403,10 @@ const ViewMap = () => {
       <div
         id="directions-container"
         style={{
-          position: "fixed",
+          position: "absolute",
           top: "10px",
           right: "10px",
+          zIndex: 1, 
           maxWidth: "200px",
           maxHeight: "250px", 
           overflow: "auto",
@@ -344,8 +417,8 @@ const ViewMap = () => {
         }}
       >
         <h3>Turn-by-Turn Directions:</h3>
+        </div>
         
-      </div>
     </div>
   );
 }
