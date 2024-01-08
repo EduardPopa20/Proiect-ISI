@@ -6,16 +6,8 @@ import { getCurrentUserById } from "../services/users";
 
 const drawerWidth = 240;
 
-const courierLinks = [
-  { text: "See", url: "/see" },
-  { text: "See", url: "/see" },
-  { text: "About", url: "/about" },
-  { text: "Services", url: "/services" },
-  { text: "Contact", url: "/contact" },
-];
+const courierLinks = [{ text: "Vizualizare comenzi", url: "/view-map" }];
 const adminLinks = [
-  { text: "sdadadsadasa", url: "/something" },
-  { text: "cevaaaaaaa", url: "/ceva" },
   { text: "Add Order", url: "/add-order" },
   { text: "Manage Orders", url: "/manage-orders" },
 ];
@@ -54,7 +46,9 @@ const Sidebar = () => {
 
   return (
     <>
-      <IconButton onClick={toggleSidebar}>{open ? <ChevronLeftIcon /> : <MenuIcon />}</IconButton>
+      <IconButton onClick={toggleSidebar}>
+        {open ? <ChevronLeftIcon /> : <MenuIcon style={{ color: "#1976d2" }} />}
+      </IconButton>
       <Drawer
         anchor="left"
         open={open}
@@ -77,15 +71,16 @@ const Sidebar = () => {
                 color="inherit"
                 sx={{ textDecoration: "none", "&:hover": { color: "#1976d2" } }}
               >
-                <ListItemText primary={link.text} />
+                <ListItemText
+                  primary={link.text}
+                  primaryTypographyProps={{ color: "primary", fontWeight: "bold" }}
+                />
               </Link>
             </ListItem>
           ))}
         </List>
       </Drawer>
-      <main style={{ marginLeft: open ? drawerWidth : 0, transition: "margin .2s" }}>
-        {/* Your page content goes here */}
-      </main>
+      <main style={{ marginLeft: open ? drawerWidth : 0, transition: "margin .2s" }}></main>
     </>
   );
 };

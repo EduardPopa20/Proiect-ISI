@@ -10,6 +10,7 @@ import Homepage from "./pages/Homepage.jsx";
 import AddOrderPage from "./pages/Order/AddOrderPage.jsx";
 import ViewMap from "./components/ViewMap.jsx";
 import AuthLayout from "./layouts/AuthLayout.jsx";
+import ManageOrderPage from "./pages/Order/ManageOrderPage.jsx";
 
 import Paths from "./resources/Paths.js";
 
@@ -39,7 +40,22 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             </AuthLayout>
           }
         />
-        <Route path={Paths.viewMap} element={<ViewMap />} />
+        <Route
+          path={Paths.viewMap}
+          element={
+            <AuthLayout>
+              <ViewMap />
+            </AuthLayout>
+          }
+        />
+        <Route
+          path={Paths.manageOrders}
+          element={
+            <AuthLayout>
+              <ManageOrderPage />
+            </AuthLayout>
+          }
+        />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

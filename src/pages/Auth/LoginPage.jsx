@@ -7,6 +7,7 @@ import { auth } from "../../services/firebase";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState(null);
 
   const navigate = useNavigate();
 
@@ -19,14 +20,19 @@ const LoginPage = () => {
         localStorage.setItem("userId", user.uid);
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
+        console.log(error.message);
+
+        if (error.message.includes("auth/too-many-requests")) {
+          setLoginError("Too many requests. Try again later.");
+        } else if (error.message.includes("auth/invalid-credential")) {
+          setLoginError("Invalid credentials. Try again.");
+        }
       });
   };
 
   return (
     <div
+      className="test_class"
       style={{
         backgroundColor: "#1976d2",
         height: "100vh",
@@ -58,6 +64,11 @@ const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            {loginError && (
+              <Typography variant="body2" color="error" align="center" gutterBottom>
+                {loginError}
+              </Typography>
+            )}
             <Button
               sx={{ display: "block", margin: "auto" }}
               variant="contained"

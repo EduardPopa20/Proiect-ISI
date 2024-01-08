@@ -8,4 +8,5 @@ export default {
   homepage: "/home",
   addOrder: "/add-order",
   viewMap: "/view-map",
+  manageOrders: "/manage-orders",
 };

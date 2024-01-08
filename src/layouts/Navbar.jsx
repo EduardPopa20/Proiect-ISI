@@ -15,6 +15,11 @@ const StyledTitle = styled(Typography)({
   flexGrow: 1,
 });
 
+const NameTypography = styled(Typography)({
+  fontSize: "0.9rem",
+  lineHeight: 1,
+});
+
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [user, setUser] = useState({ firstName: "", lastName: "" });
@@ -69,22 +74,23 @@ const Navbar = () => {
           aria-haspopup="true"
           onClick={handleMenu}
           color="inherit"
+          style={{ borderRadius: "10px" }}
         >
-          {`${user.firstName} ${user.lastName}`}
+          <NameTypography>{`${user.firstName} ${user.lastName}`}</NameTypography>
         </IconButton>
 
         <Menu
           id="menu-appbar"
           anchorEl={anchorEl}
           anchorOrigin={{
-            vertical: "top",
+            vertical: "bottom",
             horizontal: "right",
           }}
-          keepMounted
           transformOrigin={{
             vertical: "top",
             horizontal: "right",
           }}
+          getContentAnchorEl={null}
           open={Boolean(anchorEl)}
           onClose={handleClose}
         >

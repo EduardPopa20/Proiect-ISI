@@ -1,140 +1,118 @@
 import { useState } from "react";
-import { db } from "../../services/firebase";
-import { collection, addDoc } from "firebase/firestore";
-import { Button, TextField, FormControlLabel, Checkbox, Grid, Paper, Typography } from '@mui/material';
+
+import { Button, TextField, Grid, Paper, Typography } from "@mui/material";
+
+import { addLocation, addOrder } from "../../services/orders";
 
 const AddOrderPage = () => {
-      const [orderData, setOrderData] = useState({
-        location_id: '',
-        weight: 0,
-        delivered: false,
-      });    
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResult, setSearchResult] = useState(null);
 
-      const [locationFieldsVisible, setLocationFieldsVisible] = useState(false);
-    
-      const [locationData, setLocationData] = useState({
-        name: '',
-        latitude: '',
-        longitude: '',
-      });
+  const handleLocationSearch = async () => {
+    try {
+      const response = await fetch(
+        `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine=${locationData.name}`
+      );
 
-      const [addedLocationId, setAddedLocationId] = useState('');
-
-      const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setOrderData((prevData) => ({
-          ...prevData,
-          [name]: type === 'checkbox' ? checked : value,
-        }));
-      };
-
-      const handleLocationChange = (e) => {
-        const { name, value } = e.target;
+      const data = await response.json();
+      if (data.candidates && data.candidates.length > 0) {
+        const { location } = data.candidates[0];
         setLocationData((prevData) => ({
           ...prevData,
-          [name]: value,
+          latitude: location.y,
+          longitude: location.x,
         }));
-      };
-    
-      const addLocation = async (locationData) => {
-        try {
-          console.log(locationData);  
-          const locationRef = await addDoc(collection(db, 'locations'), {
-            name : locationData.name,
-            latitude : locationData.latitude,
-            longitude : locationData.longitude,
-          });
-          setAddedLocationId(locationRef.id);
-          return locationRef.id; 
-        } catch (error) {
-          console.error('Error adding location:', error.message);
-          throw error; 
-        }
-      };
+      }
+    } catch (error) {
+      console.error("Error fetching location data:", error);
+    }
+  };
+  const [orderData, setOrderData] = useState({
+    location_id: "",
+    weight: 0,
+    delivered: false,
+  });
 
-      const addOrder = async (orderData) => {
-        console.log(addedLocationId);
-        try {
-          const orderRef = await addDoc(collection(db, 'orders'),{
-            location_id : addedLocationId,
-            weight : orderData.weight,
-            delivered : orderData.delivered
-          });
-          return orderRef.id; 
-        } catch (error) {
-          console.error('Error adding order:', error.message);
-          throw error;
-        }
-      };
+  const [locationFieldsVisible, setLocationFieldsVisible] = useState(false);
 
+  const [locationData, setLocationData] = useState({
+    name: "",
+    latitude: "",
+    longitude: "",
+  });
 
-      // const handleAddLocation = async () => {
-      //   try {
-      //       console.log(locationData);
-      //       const locationId = await addLocation(locationData);
-        
-      //       setOrderData((prevData) => ({
-      //         ...prevData,
-      //         location_id: locationId,
-      //       }));
-        
-      //       // Hide location fields after adding
-      //       setLocationFieldsVisible(false);
-      //     } catch (error) {
-      //       // Handle error, show error message, etc.
-      //     }
-      // };
+  const handleChange = (e) => {
+    const { name, type, value, checked } = e.target;
+    setOrderData((prevData) => ({
+      ...prevData,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
 
-      const handleAddOrder = async () => {
-        try {
-          const locationId = await addLocation(locationData);
+  const handleLocationChange = (e) => {
+    setLocationData((prevData) => ({
+      ...prevData,
+      name: e.target.value,
+    }));
+  };
 
-          // Set location_id in orderData
-          setOrderData((prevData) => ({
-            ...prevData,
-            location_id: addedLocationId,
-          }));
+  const handleAddOrder = async () => {
+    try {
+      const locationId = await addLocation(locationData);
 
+      setOrderData((prevData) => ({
+        ...prevData,
+        location_id: locationId,
+      }));
 
-            await addOrder(orderData);
-        
-            // Reset form after successful addition
-            setOrderData({
-              location_id: '',
-              weight: 0,
-              delivered: false,
-            });
-          } catch (error) {
-          }
-      };
+      await addOrder(orderData, locationId);
 
-      return (
-        <Grid container justify="center" alignItems="center" style={{ height: '100vh' }}>
-          <Grid item xs={10} sm={8} md={6} lg={4}>
-            <Paper elevation={3} style={{ padding: '20px' }}>
-              <Typography variant="h5" gutterBottom>
-                Add Order
-              </Typography>
-              <form>
-              <Button
+      setOrderData({
+        location_id: "",
+        weight: 0,
+        delivered: false,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return (
+    <Grid container justify="center" alignItems="center" style={{ height: "100vh" }}>
+      <Grid item xs={10} sm={8} md={6} lg={4}>
+        <Paper elevation={3} style={{ padding: "20px" }}>
+          <Typography variant="h5" gutterBottom>
+            Add Order
+          </Typography>
+          <form>
+            <Button
               variant="contained"
               color="primary"
               onClick={() => setLocationFieldsVisible(!locationFieldsVisible)}
               fullWidth
-              style={{ marginBottom: '20px' }}
+              style={{ marginBottom: "20px" }}
             >
-              {locationFieldsVisible ? 'Close Location' : 'Location'}
+              {locationFieldsVisible ? "Close Location" : "Location"}
             </Button>
             {locationFieldsVisible && (
               <>
                 <TextField
-                  label="Location Name"
+                  label="Search Location"
                   name="name"
                   value={locationData.name}
-                  onChange={handleLocationChange}
+                  onChange={(e) => setLocationData({ ...locationData, name: e.target.value })}
                   fullWidth
                   margin="normal"
                 />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleLocationSearch}
+                  fullWidth
+                  style={{ marginBottom: "20px" }}
+                >
+                  Search
+                </Button>
                 <TextField
                   label="Latitude"
                   name="latitude"
@@ -153,29 +131,29 @@ const AddOrderPage = () => {
                 />
               </>
             )}
-                <TextField
-                  label="Weight"
-                  name="weight"
-                  type="number"
-                  value={orderData.weight}
-                  onChange={handleChange}
-                  fullWidth
-                  margin="normal"
-                />
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleAddOrder}
-                  fullWidth
-                  style={{ marginTop: '20px' }}
-                >
-                  Add Order
-                </Button>
-              </form>
-            </Paper>
-          </Grid>
-        </Grid>
-      );
-}
+            <TextField
+              label="Weight"
+              name="weight"
+              type="number"
+              value={orderData.weight}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddOrder}
+              fullWidth
+              style={{ marginTop: "20px" }}
+            >
+              Add Order
+            </Button>
+          </form>
+        </Paper>
+      </Grid>
+    </Grid>
+  );
+};
 
 export default AddOrderPage;
