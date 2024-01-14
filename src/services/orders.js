@@ -18,6 +18,7 @@ export const addLocation = async (locationData) => {
 export const addOrder = async (orderData, addedLocationId) => {
   try {
     const orderRef = await addDoc(collection(db, "orders"), {
+      name: orderData.name,
       location_id: addedLocationId,
       weight: orderData.weight,
       delivered: orderData.delivered,
