@@ -1,39 +1,26 @@
 import { useState } from "react";
-
 import { Button, TextField, Grid, Paper, Typography } from "@mui/material";
-
 import { addLocation, addOrder } from "../../services/orders";
+import SearchBarArcGis from "../../components/SearchBarArcGis";
 
 const AddOrderPage = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchResult, setSearchResult] = useState(null);
 
-  const handleLocationSearch = async () => {
-    try {
-      const response = await fetch(
-        `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine=${locationData.name}`
-      );
-
-      const data = await response.json();
-      if (data.candidates && data.candidates.length > 0) {
-        const { location } = data.candidates[0];
-        setLocationData((prevData) => ({
-          ...prevData,
-          latitude: location.y,
-          longitude: location.x,
-        }));
-      }
-    } catch (error) {
-      console.error("Error fetching location data:", error);
-    }
-  };
   const [orderData, setOrderData] = useState({
+    name: "",
     location_id: "",
     weight: 0,
     delivered: false,
   });
 
-  const [locationFieldsVisible, setLocationFieldsVisible] = useState(false);
+  const handleSearch = (results) => {
+    setLocationData((prevData) => ({
+      ...prevData,
+      name: results[0].results[0].name,
+      latitude: results[0].results[0].feature.geometry.latitude,
+      longitude: results[0].results[0].feature.geometry.longitude,
+    }))
+    setSearchResults(results);
+  };
 
   const [locationData, setLocationData] = useState({
     name: "",
@@ -49,6 +36,7 @@ const AddOrderPage = () => {
     }));
   };
 
+  
   const handleLocationChange = (e) => {
     setLocationData((prevData) => ({
       ...prevData,
@@ -68,9 +56,16 @@ const AddOrderPage = () => {
       await addOrder(orderData, locationId);
 
       setOrderData({
+        name: "",
         location_id: "",
         weight: 0,
         delivered: false,
+      });
+
+      setLocationData({
+        name: "",
+        latitude: "",
+        longitude: ""
       });
     } catch (error) {
       console.log(error);
@@ -80,57 +75,48 @@ const AddOrderPage = () => {
   return (
     <Grid container justify="center" alignItems="center" style={{ height: "100vh" }}>
       <Grid item xs={10} sm={8} md={6} lg={4}>
-        <Paper elevation={3} style={{ padding: "20px" }}>
+        <Paper elevation={3} style={{ padding: "20px", width: "1500px", textAlign: "center", marginTop: "80px"}}>
           <Typography variant="h5" gutterBottom>
             Add Order
           </Typography>
           <form>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setLocationFieldsVisible(!locationFieldsVisible)}
+          <TextField
+              label="Name"
+              name="name"
+              type="string"
+              value={orderData.name}
+              onChange={handleChange}
               fullWidth
-              style={{ marginBottom: "20px" }}
-            >
-              {locationFieldsVisible ? "Close Location" : "Location"}
-            </Button>
-            {locationFieldsVisible && (
-              <>
-                <TextField
-                  label="Search Location"
-                  name="name"
-                  value={locationData.name}
-                  onChange={(e) => setLocationData({ ...locationData, name: e.target.value })}
-                  fullWidth
-                  margin="normal"
-                />
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleLocationSearch}
-                  fullWidth
-                  style={{ marginBottom: "20px" }}
-                >
-                  Search
-                </Button>
-                <TextField
-                  label="Latitude"
-                  name="latitude"
-                  value={locationData.latitude}
-                  onChange={handleLocationChange}
-                  fullWidth
-                  margin="normal"
-                />
-                <TextField
-                  label="Longitude"
-                  name="longitude"
-                  value={locationData.longitude}
-                  onChange={handleLocationChange}
-                  fullWidth
-                  margin="normal"
-                />
-              </>
-            )}
+              margin="normal"
+            />
+            <SearchBarArcGis onSearch={handleSearch}/>
+            <TextField
+              label="Location Name"
+              name="locationName"
+              type="string"
+              value={locationData.name}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Latitude"
+              name="latitude"
+              type="number"
+              value={locationData.latitude}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Longitude"
+              name="longitude"
+              type="number"
+              value={locationData.longitude}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
             <TextField
               label="Weight"
               name="weight"
