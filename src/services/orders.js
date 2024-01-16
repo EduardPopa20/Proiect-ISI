@@ -1,5 +1,14 @@
 import { db } from "./firebase";
-import { collection, addDoc, getDocs, getDoc, where, query, doc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  getDoc,
+  where,
+  query,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 
 export const getUndeliveredOrders = async () => {
   try {
@@ -94,6 +103,18 @@ export const addOrder = async (orderData, addedLocationId) => {
     return orderRef.id;
   } catch (error) {
     console.error("Error adding order:", error.message);
+    throw error;
+  }
+};
+
+export const updateOrderStatus = async (orderId, newStatus) => {
+  const orderRef = doc(db, "orders", orderId);
+
+  try {
+    await updateDoc(orderRef, { delivered: newStatus });
+    console.log(`Order ${orderId} status updated to ${newStatus}`);
+  } catch (error) {
+    console.error("Error updating order status:", error);
     throw error;
   }
 };
