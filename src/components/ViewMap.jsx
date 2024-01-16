@@ -278,8 +278,10 @@ const ViewMap = () => {
                         
                         if (event.action.id === "check-mark" || event.action.id === "uncheck-mark") {
                           viewRef.current.popup.close();
-                          if (currentIndex < samplePoints.length - 1)
+                          if (currentIndex < samplePoints.length) {
                             handlePopupAction(ordersWithDetails[currentIndex - 1].orderId, event.action.id);
+                            console.log(ordersWithDetails[currentIndex - 1].orderId)
+                          }
                           resolve();
                         }
                       });
