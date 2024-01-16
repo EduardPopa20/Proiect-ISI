@@ -14,6 +14,7 @@ import "./ViewMap.css";
 import { getCurrentUser } from "../services/users";
 import { doc, getDoc , getDocs, collection, query, where } from "firebase/firestore"
 import { db } from "../services/firebase"
+import { updateOrderStatus } from "../services/orders"
 
 const ViewMap = () => {
   const mapRef = useRef();
@@ -30,7 +31,6 @@ const ViewMap = () => {
 
          esriConfig.apiKey = "AAPKeb62f5f7bd2247559a15a90d1f0793027a9QbG68B_J4KLymxgPFVKLvgGT16REirWHCgSjb0UzSkPDE5kncCC9s2zce4j5u";
          const currentUser = await getCurrentUser();
-         console.log("Current user is : " + currentUser.uid)
          const ordersCollectionRef = collection(db, 'orders');
          const getOrdersForCurrentUser = async (currentUser) => {
           try {
@@ -45,32 +45,37 @@ const ViewMap = () => {
             );
         
             const ordersSnapshot = await getDocs(ordersQuery);
-            console.log(ordersSnapshot);
             const samplePoints = [];
             samplePoints.push([44.43630348307506, 26.094558822089272]); //location of garage
+            const ordersWithDetails = [];
             for (const orderDoc of ordersSnapshot.docs) {
               const orderData = orderDoc.data();
               if (orderData.location_id) {
-                console.log("aici")
                 const locationId = orderData.location_id;
-                console.log(locationId)
                 const locationDoc = await getDoc(doc(db, 'locations', locationId));
-                console.log(locationDoc.data().longitude)
                 const locationDetails = locationDoc.data();
+                const orderWithDetails = {
+                  orderId: orderDoc.id,
+                  ...orderData,
+                  locationDetails,
+                };
+                console.log(orderWithDetails)
+                ordersWithDetails.push(orderWithDetails);
                 samplePoints.push([locationDetails.latitude, locationDetails.longitude]);
                 
               } else {
                 console.error('Location ID is undefined or null for order:', orderDoc.id);
               }
             }
-              return samplePoints;
+              return {ordersWithDetails, samplePoints};
           } catch (error) {
             console.error('Error fetching orders:', error);
             throw error;
           }
         };
-        const samplePoints = await getOrdersForCurrentUser(currentUser);
+        const {ordersWithDetails , samplePoints } = await getOrdersForCurrentUser(currentUser);
         console.log(samplePoints)
+        console.log(ordersWithDetails)
         
         const map = new ArcGISMap({
           basemap: "topo-vector",
@@ -240,7 +245,6 @@ const ViewMap = () => {
                 const actualDistance = calculateDistanceToNextPoint(optimizedStops[currentIndex].geometry, optimizedStops[currentIndex - 1].geometry);
                 totalDistance = totalDistance - actualDistance;
 
-
                 await new Promise(resolve => {
                   viewRef.current.popup.open({
                     title: "Destination Reached",
@@ -271,13 +275,16 @@ const ViewMap = () => {
                   const checkPopupVisibility = () => {
                     if (viewRef.current.popup.visible) {
                       viewRef.current.popup.on("trigger-action", (event) => {
+                        
                         if (event.action.id === "check-mark" || event.action.id === "uncheck-mark") {
                           viewRef.current.popup.close();
+                          if (currentIndex < samplePoints.length - 1)
+                            handlePopupAction(ordersWithDetails[currentIndex - 1].orderId, event.action.id);
                           resolve();
                         }
                       });
                     } else {
-                      popupTimeout = setTimeout(checkPopupVisibility, 100);
+                      setTimeout(checkPopupVisibility, 100);
                     }
                   };
           
@@ -328,6 +335,20 @@ const ViewMap = () => {
               });
             }
           }
+
+          const handlePopupAction = async (orderId, actionId) => {
+            switch (actionId) {
+              case "check-mark":
+                try {
+                  await updateOrderStatus(orderId, true);
+                } catch (error) {
+                  console.error("Error updating order status:", error);
+                }
+                break;
+              default:
+                break;
+            }
+          };
 
           function findNearestNeighbor(currentStop, remainingStops) {
             let minDistance = Infinity;
