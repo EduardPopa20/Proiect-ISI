@@ -3,14 +3,14 @@ import { db } from "./firebase";
 
 const collectionName = "locations";
 
-export const findAll = async () => {
+export const findAllLocations = async () => {
   try {
     const docRefs = await getDocs(collection(db, collectionName));
 
     const res = [];
 
     docRefs.forEach((location) => {
-      const { name, latitude, longitude} = location.data();
+      const { name, latitude, longitude } = location.data();
       res.push({
         id: location.id,
         name,

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Container, Typography, TextField, Button } from "@mui/material";
+import { Link } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
@@ -135,6 +136,12 @@ const RegisterPage = () => {
                 Passwords do not match
               </Typography>
             )}
+            <Typography variant="body2" align="center" gutterBottom>
+              Already have an account?{" "}
+              <Link to="/login" style={{ color: "#1976d2", textDecoration: "none" }}>
+                Sign in
+              </Link>
+            </Typography>
             <Button
               variant="contained"
               color="primary"

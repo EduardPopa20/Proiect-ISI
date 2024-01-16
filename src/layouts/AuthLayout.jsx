@@ -13,11 +13,7 @@ const AuthLayout = ({ children }) => {
       <div style={{ marginTop: "64px", display: "flex", width: "100%" }}>
         <Sidebar />
 
-        <div
-          style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%" }}
-        >
-          {children}
-        </div>
+        <div style={{ width: "100%", height: "100%" }}>{children}</div>
       </div>
     </div>
   );

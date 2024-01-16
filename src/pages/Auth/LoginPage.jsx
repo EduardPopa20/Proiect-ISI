@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Container, Typography, TextField, Button } from "@mui/material";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../services/firebase";
 
@@ -69,6 +70,12 @@ const LoginPage = () => {
                 {loginError}
               </Typography>
             )}
+            <Typography variant="body2" align="center" gutterBottom>
+              Don&apos;t have an account?{" "}
+              <Link to="/register" style={{ color: "#1976d2", textDecoration: "none" }}>
+                Sign up
+              </Link>
+            </Typography>
             <Button
               sx={{ display: "block", margin: "auto" }}
               variant="contained"

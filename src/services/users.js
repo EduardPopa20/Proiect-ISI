@@ -2,7 +2,7 @@ import { getDocs, collection, doc, getDoc } from "firebase/firestore";
 
 import { db } from "./firebase";
 
-export const findAll = async () => {
+export const findAllUsers = async () => {
   const doc_refs = await getDocs(collection(db, "users"));
   const res = [];
 

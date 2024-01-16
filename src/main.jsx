@@ -7,10 +7,10 @@ import RegisterPage from "./pages/Auth/RegisterPage.jsx";
 import RecoverPasswordPage from "./pages/Auth/RecoverPasswordPage.jsx";
 import ResetPasswordPage from "./pages/Auth/ResetPasswordPage.jsx";
 import Homepage from "./pages/Homepage.jsx";
+import AssignOrderPage from "./pages/Order/AssignOrderPage.jsx";
 import AddOrderPage from "./pages/Order/AddOrderPage.jsx";
 import ViewMap from "./components/ViewMap.jsx";
 import AuthLayout from "./layouts/AuthLayout.jsx";
-import ManageOrderPage from "./pages/Order/ManageOrderPage.jsx";
 
 import Paths from "./resources/Paths.js";
 
@@ -25,7 +25,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path={Paths.forgotPassword} element={<RecoverPasswordPage />} />
         <Route path={Paths.resetPassword} element={<ResetPasswordPage />} />
         <Route
-          path={Paths.homepage}
+          path={Paths.index}
           element={
             <AuthLayout>
               <Homepage />
@@ -49,10 +49,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           }
         />
         <Route
-          path={Paths.manageOrders}
+          path={Paths.assignOrder}
           element={
             <AuthLayout>
-              <ManageOrderPage />
+              <AssignOrderPage />
             </AuthLayout>
           }
         />

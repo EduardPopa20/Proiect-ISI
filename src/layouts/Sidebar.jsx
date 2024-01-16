@@ -6,15 +6,14 @@ import { getCurrentUserById } from "../services/users";
 
 const drawerWidth = 240;
 
-const courierLinks = [{ text: "Vizualizare comenzi", url: "/view-map" }];
+const courierLinks = [{ text: "View orders", url: "/view-map" }];
 const adminLinks = [
   { text: "Add Order", url: "/add-order" },
-  { text: "Manage Orders", url: "/manage-orders" },
+  { text: "Assign Order", url: "/assign-order" },
 ];
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
-
   const [links, setLinks] = useState([]);
 
   useEffect(() => {
@@ -46,9 +45,20 @@ const Sidebar = () => {
 
   return (
     <>
-      <IconButton onClick={toggleSidebar}>
-        {open ? <ChevronLeftIcon /> : <MenuIcon style={{ color: "#1976d2" }} />}
-      </IconButton>
+      <div
+        style={{
+          position: "fixed",
+          top: "50%",
+          transform: "translateY(-50%)",
+          zIndex: 1000,
+          marginLeft: open ? drawerWidth : 0,
+          transition: "margin .2s",
+        }}
+      >
+        <IconButton onClick={toggleSidebar}>
+          {open ? <ChevronLeftIcon /> : <MenuIcon style={{ color: "#1976d2" }} />}
+        </IconButton>
+      </div>
       <Drawer
         anchor="left"
         open={open}
