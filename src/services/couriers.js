@@ -1,4 +1,4 @@
-import { getDocs, doc, updateDoc, collection, where, query } from "firebase/firestore";
+import { getDocs, getDoc, doc, updateDoc, collection, where, query } from "firebase/firestore";
 import { db } from "./firebase";
 
 export const getAllCouriers = async () => {
@@ -37,6 +37,31 @@ export const assignCourierToOrder = async (selectedCourier, selectedOrderId) => 
     console.log("Order assigned successfully!");
   } catch (error) {
     console.error("Error assigning order:", error.message);
+    throw error;
+  }
+};
+
+export const unassignCourierFromOrder = async (orderId, courierId) => {
+  try {
+    if (!orderId || !courierId) {
+      throw new Error("Both orderId and courierId must be provided.");
+    }
+
+    const orderDocRef = doc(db, "orders", orderId);
+    const orderDoc = await getDoc(orderDocRef);
+
+    if (!orderDoc.exists()) {
+      throw new Error("Order not found.");
+    }
+
+    await updateDoc(orderDocRef, {
+      courierId: null,
+      assigned: false,
+    });
+
+    console.log("Courier unassigned successfully!");
+  } catch (error) {
+    console.error("Error unassigning courier from order:", error.message);
     throw error;
   }
 };

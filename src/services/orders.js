@@ -1,38 +1,45 @@
 import { db } from "./firebase";
-import { collection, addDoc, getDocs, where, query, doc } from "firebase/firestore";
+import { collection, addDoc, getDocs, getDoc, where, query, doc } from "firebase/firestore";
 
 export const getUndeliveredOrders = async () => {
   try {
     const ordersCollection = collection(db, "orders");
-    const unassignedOrdersQuery = query(ordersCollection, where("delivered", "==", false));
-    const querySnapshot = await getDocs(unassignedOrdersQuery);
-
+    const undeliveredOrdersQuery = query(ordersCollection, where("delivered", "==", false));
+    const querySnapshot = await getDocs(undeliveredOrdersQuery);
     const undeliveredOrders = [];
-
-    const couriersCollection = collection(db, "couriers");
 
     for (const orderDoc of querySnapshot.docs) {
       const orderData = orderDoc.data();
+
+      const locationId = orderData.location_id;
+      let locationDocument;
+
       const courierId = orderData.courierId;
       let courierDocument;
 
       if (courierId) {
-        courierDocument = await getDocs(doc(db, couriersCollection, courierId));
+        const courierRef = doc(db, "users", courierId);
+        const courierSnapshot = await getDoc(courierRef);
+        courierDocument = courierSnapshot.data();
+
+        const locationRef = doc(db, "locations", locationId);
+        const locationSnapshot = await getDoc(locationRef);
+        locationDocument = locationSnapshot.data();
       }
 
       let courierName = courierDocument
-        ? `${courierDocument.data().firstName} ${courierDocument.data().lastName}`
+        ? `${courierDocument.firstName} ${courierDocument.lastName}`
         : "Not assigned";
+
+      let locationName = locationDocument ? locationDocument.name : "-";
 
       undeliveredOrders.push({
         id: orderDoc.id,
         ...orderData,
         courierName,
+        locationName,
       });
-
-      console.log(undeliveredOrders);
     }
-
     return undeliveredOrders;
   } catch (error) {
     console.error("Error fetching undelivered orders:", error.message);
