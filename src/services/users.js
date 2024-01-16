@@ -1,12 +1,13 @@
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getDocs, collection, doc, getDoc } from "firebase/firestore";
 
 import { db } from "./firebase";
 
-export const findAllUsers = async () => {
-  const doc_refs = await getDocs(collection(db, "users"));
+export const findAll = async () => {
+  const docRefs = await getDocs(collection(db, "users"));
   const res = [];
 
-  doc_refs.forEach((user) => {
+  docRefs.forEach((user) => {
     res.push({
       id: user.id,
       ...user.data(),
@@ -38,3 +39,15 @@ export const getCurrentUserById = async (userId) => {
     return null;
   }
 };
+
+const auth = getAuth();
+
+export const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      unsubscribe();
+      resolve(user);
+    }, reject);
+  });
+};
+
