@@ -11,13 +11,14 @@ import AssignOrderPage from "./pages/Order/AssignOrderPage.jsx";
 import AddOrderPage from "./pages/Order/AddOrderPage.jsx";
 import ViewMap from "./components/ViewMap.jsx";
 import AuthLayout from "./layouts/AuthLayout.jsx";
+import AuditOrderPage from "./pages/Order/AuditOrdersPage.jsx";
 
 import Paths from "./resources/Paths.js";
 
 import "./styles/index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path={Paths.login} element={<LoginPage />} />
@@ -56,7 +57,15 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             </AuthLayout>
           }
         />
+        <Route
+          path={Paths.auditDeliveredOrders}
+          element={
+            <AuthLayout>
+              <AuditOrderPage />
+            </AuthLayout>
+          }
+        />
       </Routes>
     </BrowserRouter>
-  </React.StrictMode>
+  // </React.StrictMode>
 );
