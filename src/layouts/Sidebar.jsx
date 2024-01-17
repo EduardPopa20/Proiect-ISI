@@ -9,7 +9,8 @@ const drawerWidth = 240;
 const courierLinks = [{ text: "View orders", url: "/view-map" }];
 const adminLinks = [
   { text: "Add Order", url: "/add-order" },
-  { text: "Assign Order", url: "/assign-order" },
+  { text: "Assign Order", url: "/assign-order " },
+  { text: "Audit Orders", url: "/audit-orders" },
 ];
 
 const Sidebar = () => {

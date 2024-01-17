@@ -1,37 +1,69 @@
 .check-mark-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    position: relative;
-  }
-  
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  position: relative;
+}
+
 .check-mark-button::before {
-    content: '\2713'; 
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+  content: "\2713";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 
+.uncheck-mark-button {
+  background-color: #ff0000;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  position: relative;
+}
 
-  .uncheck-mark-button {
-    background-color: #ff0000;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    position: relative;
-  }
-  
-  .uncheck-mark-button::before {
-    content: '✖'; 
-    font-size: 18px; 
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+.uncheck-mark-button::before {
+  content: "✖";
+  font-size: 18px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.esri-view-root {
+}
+
+canvas {
+  width: 100% !important;
+}
+
+.esri-zoom {
+  display: none;
+}
+
+.esri-attribution__sources {
+  display: none;
+}
+
+.esri-attribution__powered-by {
+  display: none;
+}
+
+.esri-popup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.esri-popup__main-container {
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px !important;
+  border-radius: 5px;
+  margin-top: 10px;
+  padding: 20px;
+  line-height: 50px;
+}

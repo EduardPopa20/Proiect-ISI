@@ -18,54 +18,52 @@ import Paths from "./resources/Paths.js";
 import "./styles/index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  // <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path={Paths.login} element={<LoginPage />} />
-        <Route path={Paths.register} element={<RegisterPage />} />
-        <Route path={Paths.forgotPassword} element={<RecoverPasswordPage />} />
-        <Route path={Paths.resetPassword} element={<ResetPasswordPage />} />
-        <Route
-          path={Paths.index}
-          element={
-            <AuthLayout>
-              <Homepage />
-            </AuthLayout>
-          }
-        />
-        <Route
-          path={Paths.addOrder}
-          element={
-            <AuthLayout>
-              <AddOrderPage />
-            </AuthLayout>
-          }
-        />
-        <Route
-          path={Paths.viewMap}
-          element={
-            <AuthLayout>
-              <ViewMap />
-            </AuthLayout>
-          }
-        />
-        <Route
-          path={Paths.assignOrder}
-          element={
-            <AuthLayout>
-              <AssignOrderPage />
-            </AuthLayout>
-          }
-        />
-        <Route
-          path={Paths.auditDeliveredOrders}
-          element={
-            <AuthLayout>
-              <AuditOrderPage />
-            </AuthLayout>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
-  // </React.StrictMode>
+  <BrowserRouter>
+    <Routes>
+      <Route path={Paths.login} element={<LoginPage />} />
+      <Route path={Paths.register} element={<RegisterPage />} />
+      <Route path={Paths.forgotPassword} element={<RecoverPasswordPage />} />
+      <Route path={Paths.resetPassword} element={<ResetPasswordPage />} />
+      <Route
+        path={Paths.index}
+        element={
+          <AuthLayout>
+            <Homepage />
+          </AuthLayout>
+        }
+      />
+      <Route
+        path={Paths.addOrder}
+        element={
+          <AuthLayout>
+            <AddOrderPage />
+          </AuthLayout>
+        }
+      />
+      <Route
+        path={Paths.viewMap}
+        element={
+          <AuthLayout>
+            <ViewMap />
+          </AuthLayout>
+        }
+      />
+      <Route
+        path={Paths.assignOrder}
+        element={
+          <AuthLayout>
+            <AssignOrderPage />
+          </AuthLayout>
+        }
+      />
+      <Route
+        path={Paths.auditDeliveredOrders}
+        element={
+          <AuthLayout>
+            <AuditOrderPage />
+          </AuthLayout>
+        }
+      />
+    </Routes>
+  </BrowserRouter>
 );

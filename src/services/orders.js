@@ -8,7 +8,6 @@ import {
   query,
   doc,
   updateDoc,
-  Timestamp
 } from "firebase/firestore";
 
 export const getUndeliveredOrders = async () => {
@@ -168,14 +167,8 @@ export const getDeliveredOrders = async () => {
 
 export const getOrdersAssignedForTodayByCourierId = async (courierId) => {
   try {
-    const currentDate = new Date();
-    const startOfToday = new Date(currentDate.setHours(0, 0, 0, 0));
-    const endOfToday = new Date(currentDate.setHours(23, 59, 59, 999));
-
     const ordersCollection = collection(db, "orders");
-    const assignedOrdersQuery = query(ordersCollection, where("courierId", "==", courierId), 
-                                where('toBeDeliveredOn', '>=', Timestamp.fromDate(startOfToday)),
-                                where('toBeDeliveredOn', '<=', Timestamp.fromDate(endOfToday)));
+    const assignedOrdersQuery = query(ordersCollection, where("courierId", "==", courierId));
     const querySnapshot = await getDocs(assignedOrdersQuery);
     const assignedOrders = [];
     for (const orderDoc of querySnapshot.docs) {
@@ -188,7 +181,7 @@ export const getOrdersAssignedForTodayByCourierId = async (courierId) => {
       const locationRef = doc(db, "locations", locationId);
       const locationSnapshot = await getDoc(locationRef);
       locationDocument = locationSnapshot.data();
-      
+
       let locationName = locationDocument ? locationDocument.name : "-";
 
       assignedOrders.push({
@@ -197,9 +190,11 @@ export const getOrdersAssignedForTodayByCourierId = async (courierId) => {
         locationName,
       });
     }
+
+    console.log(assignedOrders);
     return assignedOrders;
   } catch (error) {
     console.error("Error fetching assigned orders for courier :", error.message);
     throw error;
   }
-}
+};
