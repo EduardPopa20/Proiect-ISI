@@ -1,5 +1,5 @@
 export default {
-  index: "/",
+  index: "/home",
   register: "/register",
   login: "/login",
   forgotPassword: "/password-recovery",
@@ -8,4 +8,5 @@ export default {
   addOrder: "/add-order",
   viewMap: "/view-map",
   assignOrder: "/assign-order",
+  auditDeliveredOrders: '/audit-orders'
 };

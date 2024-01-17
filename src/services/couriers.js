@@ -1,5 +1,6 @@
 import { getDocs, getDoc, doc, updateDoc, collection, where, query } from "firebase/firestore";
 import { db } from "./firebase";
+import { serverTimestamp } from 'firebase/firestore';
 
 export const getAllCouriers = async () => {
   try {
@@ -29,9 +30,13 @@ export const assignCourierToOrder = async (selectedCourier, selectedOrderId) => 
     }
 
     const orderDocRef = doc(db, "orders", selectedOrderId);
+
+    const currentTimestamp = serverTimestamp();
+
     await updateDoc(orderDocRef, {
       courierId: selectedCourier,
       assigned: true,
+      toBeDeliveredOn: currentTimestamp,
     });
 
     console.log("Order assigned successfully!");
