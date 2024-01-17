@@ -17,7 +17,7 @@ const LoginPage = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        navigate("/home");
+        navigate("/assign-order");
         localStorage.setItem("userId", user.uid);
       })
       .catch((error) => {

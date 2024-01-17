@@ -35,9 +35,15 @@ const AssignOrderPage = () => {
   const [selectedCourier, setSelectedCourier] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSuccessButtonClick = () => {
     setShowSuccessMessage(false);
+  };
+
+  const handleErrorButtonClick = () => {
+    setShowErrorMessage(false);
   };
 
   useEffect(() => {
@@ -79,6 +85,7 @@ const AssignOrderPage = () => {
     try {
       await unassignCourierFromOrder(orderId, courierId);
       setShowSuccessMessage(true);
+      setShowErrorMessage(false);
 
       getUnassignedOrders().then((data) => {
         setUnassignedOrders(data);
@@ -92,6 +99,9 @@ const AssignOrderPage = () => {
       setSelectedOrderId("");
     } catch (error) {
       console.error("Error unassigning courier from order:", error.message);
+      setErrorMessage("Error unassigning courier from order. Please try again.");
+      setShowErrorMessage(true);
+      setShowSuccessMessage(false);
     }
   };
 
@@ -100,16 +110,25 @@ const AssignOrderPage = () => {
       if (selectedCourier && selectedOrderId) {
         await assignCourierToOrder(selectedCourier, selectedOrderId);
         setShowSuccessMessage(true);
+        setShowErrorMessage(false);
+
         getUnassignedOrders().then((data) => {
           setUnassignedOrders(data);
         });
+
         setSelectedCourier("");
         setSelectedOrderId("");
       } else {
         console.error("Both courier and order must be selected.");
+        setErrorMessage("Both courier and order must be selected.");
+        setShowErrorMessage(true);
+        setShowSuccessMessage(false);
       }
     } catch (error) {
       console.error("Error assigning courier to order:", error.message);
+      setErrorMessage("Error assigning courier to order. Please try again.");
+      setShowErrorMessage(true);
+      setShowSuccessMessage(false);
     } finally {
       getUndeliveredOrders().then((data) => {
         setUndeliveredOrders(data);
@@ -349,6 +368,24 @@ const AssignOrderPage = () => {
         >
           <Alert severity="success" sx={{ margin: "16px 0" }}>
             Operation was successful!
+          </Alert>
+        </Fade>
+      )}
+      {showErrorMessage && (
+        <Fade
+          in={showErrorMessage}
+          timeout={{ enter: 1000, exit: 1000 }}
+          style={{
+            position: "absolute",
+            bottom: "20px",
+            right: "20px",
+            width: "auto",
+            cursor: "pointer",
+          }}
+          onClick={handleErrorButtonClick}
+        >
+          <Alert severity="error" sx={{ margin: "16px 0" }}>
+            {errorMessage}
           </Alert>
         </Fade>
       )}
